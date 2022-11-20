@@ -1,0 +1,47 @@
+.main-list {
+    list-style-type: none;
+    /* background-color: rgb(0, 187, 255); */
+    /* border: 2px solid black; */
+    width: 60%;
+    margin: 30px auto 50px;
+    padding: 0;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.list-item {
+    background-color: rgb(211, 211, 211);
+    font-size: 25px;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    width: 100%;
+    height: 70px;
+    padding: 10px 20px;
+    box-sizing: border-box;
+    border: 1px solid black;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    box-shadow: 0px 0px 10px gray , 0px 0px 15px gray;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.delete-btn {
+    font-size: 20px;
+    padding: 8px 16px;
+    background-color: gray;
+    color: white;
+}
+
+.delete-btn:hover {
+    background-color: black;
+}
+
+.delete-btn:active {
+    background-color: white;
+    color: black;
+}

@@ -1,0 +1,152 @@
+
+.form {
+    background-color: whitesmoke;
+    border: 2px solid black;
+    border-radius: 10px;
+    width: 60%;
+    /* height: 400px; */
+    margin: 30px auto 0;
+    padding: 10px;
+    box-sizing: border-box;
+    display: grid;
+    grid-template-areas: 
+    "fName lName" 
+    "age city" 
+    "btn btn";
+    grid-template-columns: repeat(2 , 1fr);
+    grid-template-rows: repeat(3 , 100px);
+    gap: 10px;
+}
+
+.label-style {
+    margin-right: 20px;
+    font-size: 23px;
+    font-family: monospace;
+}
+
+.name-input {
+    width: 50%;
+    font-size: 20px;
+    padding: 5px 10px;
+    font-family: monospace;
+}
+
+.name-input::placeholder {
+    color: rgba(0, 96, 0, 0.7);
+}
+
+.name-input:focus {
+    box-shadow: 0px 0px 20px rgba(0, 96, 0, 0.7);
+}
+
+.form > section {
+    /* background-color: aqua; */
+    /* width: 80%; */
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+}
+
+#firstName-section {
+    grid-area: fName;
+}
+
+#lastName-section {
+    grid-area: lName;
+}
+
+#age-section {
+    grid-area: age;
+}
+
+#city-section {
+    grid-area: city;
+}
+
+
+#btn-section {
+    /* width: 50%; */
+    grid-area: btn;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+}
+
+.form-btn {
+    font-size: 20px;
+    font-family: monospace;
+    padding: 12px 16px;
+    border-radius: 5px;
+    border: 1px solid black;
+    transition: 0.4s ease-out;
+}
+
+.form-btn:first-child {
+    margin-right: 15px;
+}
+
+.form-btn:last-child {
+    margin-left: 15px;
+}
+
+.form-btn:hover {
+    background-color: gray;
+    color: white;
+}
+
+.form-btn:active {
+    background-color: black;
+    transition: none;
+}
+
+
+
+
+/* Media Query */
+@media screen and (max-width: 900px) {
+    .form {
+        grid-template-areas: 
+        "fName"
+        "lName"
+        "age"
+        "city"
+        "btn";
+        grid-template-columns: 1fr;
+        grid-template-rows: repeat(5 , 100px);
+    }
+}
+
+@media screen and (max-width: 710px) {
+    .form > section {
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+
+    #btn-section {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: center;
+    }
+    
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
