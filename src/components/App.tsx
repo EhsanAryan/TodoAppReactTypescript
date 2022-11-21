@@ -1,30 +1,17 @@
 import React , { useState } from 'react';
-import Main from "./Main";
+import Input from "./Input";
+import Table from "./Table";
 import "./App.css";
+import { JobType } from "../Types/JobType";
 
 
-type myType = {
-  value: number
-}
-
-
-const App: React.FunctionComponent = () => {
-  const [num , setNum] = useState<number>(0)
-
-  const testFunc = (x: myType , y: myType): void => {
-    setNum(prevNum => {
-      return x.value + y.value + prevNum;
-    });
-  }
-
+const App: React.FC = () => {
+  const [allJobs , setAllJobs] = useState<JobType[]>([])
 
   return (
     <div className='app-div'>
-      <button className="btn btn-lg btn-dark my-3" 
-      onClick={() => testFunc({value : 10} , {value : 20})}>
-        Click Me
-      </button>
-      <Main num={num} setNum={setNum} />
+      <Input allJobs={allJobs} setAllJobs={setAllJobs} />
+      <Table allJobs={allJobs} setAllJobs={setAllJobs} />
     </div>
   );
 }

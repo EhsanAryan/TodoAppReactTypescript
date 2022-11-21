@@ -1,0 +1,18 @@
+.input-section {
+    width: 50%;
+    min-height: 250px;
+    background-color: rgba(0, 0, 0, 0.4);
+    box-shadow: 0px 0px 10px white;
+}
+
+@media screen and (max-width : 992px) {
+    .input-section {
+        width: 75%;
+    }
+}
+
+@media screen and (max-width : 600px) {
+    .input-section {
+        width: 100%;
+    }
+}
