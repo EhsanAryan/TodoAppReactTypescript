@@ -39,7 +39,7 @@ const handleJobValidation = (job: string): boolean => {
 
 
 const Input: React.FC<InputProps> = (props) => {
-    const {allJobs , setAllJobs} = props;
+    const {setAllJobs} = props;
 
     const [job , setJob] = useState<string>("");
 
