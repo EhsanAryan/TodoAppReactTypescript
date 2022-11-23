@@ -15,10 +15,73 @@ const Table: React.FC<TableProps> = (props) => {
     const {allJobs , setAllJobs} = props;
 
     const deleteJob = (jobId: string): void => {
-        setAllJobs(prevState => {
-            return prevState.filter(job => job.id !== jobId)
+        swal({
+            title: "Confirmation" ,
+            icon : "warning" ,
+            text : "Are you sure?" ,
+            buttons : ["No" , "Yes"] ,
+            dangerMode : true
         })
+        .then(value => {
+            if(value) {
+                setAllJobs(prevState => {
+                    return prevState.filter(job => job.id !== jobId)
+                });
+        
+                let jobs: JobType[] = JSON.parse(localStorage.getItem("jobs")!);
+                jobs = jobs.filter((job: JobType) => job.id !== jobId);
+                localStorage.setItem("jobs" , JSON.stringify(jobs));
+            }
+        });
     }
+
+    const handleCompleteness = (jobId : string): void => {
+        let jobs: JobType[] = JSON.parse(localStorage.getItem("jobs")!);
+        jobs.forEach(job => {
+            if(job.id === jobId) {
+                job.isCompleted = !job.isCompleted;
+            }
+        })
+
+        setAllJobs(jobs);
+
+        localStorage.setItem("jobs" , JSON.stringify(jobs));
+    }
+
+    const deleteAllJobs = () => {
+        swal({
+            title: "Confirmation" ,
+            icon : "warning" ,
+            text : "Are you sure?" ,
+            buttons : ["No" , "Yes"] ,
+            dangerMode : true
+        })
+        .then(value => {
+            if(value) {
+                setAllJobs([]);
+                localStorage.removeItem("jobs");
+            }
+        });
+    }
+
+    const deleteCompletedJobs = () => {
+        swal({
+            title: "Confirmation" ,
+            icon : "warning" ,
+            text : "Are you sure?" ,
+            buttons : ["No" , "Yes"] ,
+            dangerMode : true
+        })
+        .then(value => {
+            if(value) {
+                let jobs: JobType[] = JSON.parse(localStorage.getItem("jobs")!);
+                jobs = jobs.filter(job => job.isCompleted === false);
+                setAllJobs(jobs);
+                localStorage.setItem("jobs" , JSON.stringify(jobs));
+            }
+        });
+    }
+
 
     return (
         <div className={`table-container mx-auto rounded-4 my-5 px-3 py-4 
@@ -26,7 +89,7 @@ const Table: React.FC<TableProps> = (props) => {
            {allJobs.length > 0 ? (
              <>
                 <h1 className="text-center mb-4">Jobs Table</h1>
-                <table className="table table-dark table-bordered table-striped table-hover
+                <table className="table table-dark table-bordered table-hover
                 w-100 mx-auto text-center">
                     <thead>
                         <tr>
@@ -39,14 +102,19 @@ const Table: React.FC<TableProps> = (props) => {
                     <tbody>
                         {allJobs.map((job , jobIndex) => {
                             return (
-                                <tr key={job.id}>
+                                <tr key={job.id} className={`${job.isCompleted ? "table-active" : ""}`}>
                                     <td>{jobIndex}</td>
                                     <td>{job.text}</td>
                                     <td>
-                                        {job.isCompleted ? "Completed" : "Incomplete"}
+                                        <button type="button" className={`btn 
+                                        ${job.isCompleted ? "btn-success" : "btn-danger"}`}
+                                        onClick={() => handleCompleteness(job.id)}>
+                                            {job.isCompleted ? "Completed" : "Incomplete"}
+                                        </button>
+                                        
                                     </td>
                                     <td>
-                                        <button className="btn btn-outline-light" 
+                                        <button type="button" className="btn btn-outline-light" 
                                         onClick={() => deleteJob(job.id)}>
                                             Delete
                                         </button>
@@ -56,6 +124,16 @@ const Table: React.FC<TableProps> = (props) => {
                         })}
                     </tbody>
                 </table>
+                <div className="mt-4 text-center">
+                        <button type="button" className="btn btn-danger btn-lg mx-2 my-1"
+                        onClick={deleteAllJobs}>
+                            Delete All Jobs
+                        </button>
+                        <button type="button" className="btn btn-secondary btn-lg mx-2 my-1"
+                        onClick={deleteCompletedJobs}>
+                            Delete Completed Jobs
+                        </button>
+                </div>
              </>
            ) : (
             <h1>No jobs to show!</h1>

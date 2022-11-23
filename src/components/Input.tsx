@@ -56,11 +56,13 @@ const Input: React.FC<InputProps> = (props) => {
 
         setAllJobs(prevState => {
             return [...prevState , newJob];
-        })
+        });
+
+        let jobs: JobType[] = localStorage.getItem("jobs") ? JSON.parse(localStorage.getItem("jobs")!) : [];
+        jobs = [...jobs , newJob];
+        localStorage.setItem("jobs" , JSON.stringify(jobs));
 
         setJob("");
-
-        console.log(allJobs);
     }
 
     const handleEnter = (event: React.KeyboardEvent<HTMLInputElement>) => {
