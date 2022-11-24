@@ -136,13 +136,13 @@ const Table: React.FC<TableProps> = (props) => {
     }
 
     return (
-        <div className={`table-container mx-auto rounded-4 my-5 px-3 py-4 
+        <div className={`table-container container mx-auto rounded-4 my-5 px-3 py-4
         ${allJobs.length === 0 ? "d-flex justify-content-center align-items-center" : "table-responsive"}`}>
            {allJobs.length > 0 ? (
              <>
                 <h1 className="text-center mb-4">Jobs Table</h1>
                 <table className="table table-dark table-bordered table-hover
-                w-100 mx-auto text-center">
+                w-100 mx-auto text-center align-middle">
                     <thead>
                         <tr>
                             <th>#</th>
@@ -171,11 +171,11 @@ const Table: React.FC<TableProps> = (props) => {
                                         
                                     </td>
                                     <td>
-                                        <button type="button" className="btn mx-1 btn-outline-light" 
+                                        <button type="button" className="btn mx-1 my-1 btn-outline-light" 
                                         onClick={() => deleteJob(job.id)}>
                                             Delete
                                         </button>
-                                        <button type="button" className="btn mx-1 btn-outline-light" 
+                                        <button type="button" className="btn mx-1 my-1 btn-outline-light" 
                                         onClick={(event: React.MouseEvent) => selectJob(job.id , event)}>
                                             Edit
                                         </button>
