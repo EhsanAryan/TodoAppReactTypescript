@@ -1,13 +1,22 @@
-import React , { useState } from 'react';
+import React from 'react';
 import swal from 'sweetalert';
 import "./Input.css";
 import { JobType } from "../Types/JobType";
 
-type SetAllJobsParameter = (prevState: JobType[]) => JobType[]
+
+type SetAllJobsParameterType = (prevState: JobType[]) => JobType[];
+
+type SetJobParameterType = (prevJob: string) => string;
+
+type SetSelectedJobIdParameterType = (prevJobId: string) => string;
 
 type InputProps = {
     allJobs : JobType[] ,
-    setAllJobs : (newAllJobs: JobType[] | SetAllJobsParameter) => void
+    setAllJobs : (newAllJobs: JobType[] | SetAllJobsParameterType) => void ,
+    job : string ,
+    setJob : (newJob: string | SetJobParameterType) => void ,
+    selectedJobId : string ,
+    setSelectedJobId : (newSelectedJobId: string | SetSelectedJobIdParameterType) => void
 }
 
 const handleJobValidation = (job: string): boolean => {
@@ -39,36 +48,60 @@ const handleJobValidation = (job: string): boolean => {
 
 
 const Input: React.FC<InputProps> = (props) => {
-    const {setAllJobs} = props;
+    const {setAllJobs , job , setJob , selectedJobId , setSelectedJobId} = props;
 
-    const [job , setJob] = useState<string>("");
 
     const addNewJob = () => {
-        if(!handleJobValidation(job)) {
-            return;
+        if(selectedJobId.length === 0) {
+            if(!handleJobValidation(job)) {
+                return;
+            }
+    
+            const newJob: JobType = {
+                id: Math.random().toString() ,
+                text : job ,
+                isCompleted : false
+            }
+    
+            setAllJobs(prevState => {
+                return [...prevState , newJob];
+            });
+    
+            let jobs: JobType[] = localStorage.getItem("jobs") ? JSON.parse(localStorage.getItem("jobs")!) : [];
+            jobs = [...jobs , newJob];
+            localStorage.setItem("jobs" , JSON.stringify(jobs));
+    
+            setJob("");
         }
+        else {
+            if(!handleJobValidation(job)) {
+                return;
+            }
+            
+            let jobs: JobType[] = JSON.parse(localStorage.getItem("jobs")!);
+            jobs = jobs.map((j: JobType) => {
+                if(j.id === selectedJobId) {
+                    j = {...j , text: job};
+                }
+                return j;
+            });
+            setAllJobs(jobs);
+            localStorage.setItem("jobs" , JSON.stringify(jobs));
 
-        const newJob: JobType = {
-            id: Math.random().toString() ,
-            text : job ,
-            isCompleted : false
+            setSelectedJobId("");
+            setJob("");
         }
-
-        setAllJobs(prevState => {
-            return [...prevState , newJob];
-        });
-
-        let jobs: JobType[] = localStorage.getItem("jobs") ? JSON.parse(localStorage.getItem("jobs")!) : [];
-        jobs = [...jobs , newJob];
-        localStorage.setItem("jobs" , JSON.stringify(jobs));
-
-        setJob("");
     }
 
     const handleEnter = (event: React.KeyboardEvent<HTMLInputElement>) => {
         if(event.key === "Enter"){
             addNewJob();
         }
+    }
+
+    const cancelEditting = () => {
+        setSelectedJobId("");
+        setJob("");
     }
 
 
@@ -78,10 +111,18 @@ const Input: React.FC<InputProps> = (props) => {
             <input type="text" className="form-control w-75 mx-auto my-2" placeholder="Enter new job..."
             value={job} onChange={(event: React.ChangeEvent<HTMLInputElement>) => setJob(event.target.value)}
             onKeyDown={handleEnter} />
-            <button type="button" className="btn btn-success btn-lg my-2"
-            onClick={addNewJob}>
-                Add
-            </button>
+           <div className="my-2">
+                <button type="button" className="btn btn-success btn-lg mx-1"
+                onClick={addNewJob}>
+                    {selectedJobId.length !== 0 ? "Edit" : "Add"}
+                </button>
+                {selectedJobId.length !== 0 ? (
+                    <button type="button" className="btn btn-danger btn-lg mx-1"
+                    onClick={cancelEditting}>
+                        Cancel
+                    </button>
+                ) : null}
+           </div>
         </div>
     )
 }

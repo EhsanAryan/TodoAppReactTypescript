@@ -9,6 +9,10 @@
     opacity: 0.5;
 }
 
+.none-pointer-event {
+    pointer-events: none;
+}
+
 
 
 @media screen and (max-width : 992px) {

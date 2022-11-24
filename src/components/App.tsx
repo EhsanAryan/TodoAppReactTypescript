@@ -7,6 +7,9 @@ import { JobType } from "../Types/JobType";
 
 const App: React.FC = () => {
   const [allJobs , setAllJobs] = useState<JobType[]>([]);
+  const [job , setJob] = useState<string>("");
+  const [selectedJobId , setSelectedJobId] = useState<string>("");
+
 
   useEffect(() => {
     if(localStorage.getItem("jobs")) {
@@ -16,8 +19,10 @@ const App: React.FC = () => {
 
   return (
     <div className='app-div'>
-      <Input allJobs={allJobs} setAllJobs={setAllJobs} />
-      <Table allJobs={allJobs} setAllJobs={setAllJobs} />
+      <Input allJobs={allJobs} setAllJobs={setAllJobs} job={job} setJob={setJob} 
+      selectedJobId={selectedJobId} setSelectedJobId={setSelectedJobId} />
+      <Table allJobs={allJobs} setAllJobs={setAllJobs} job={job} setJob={setJob} 
+      selectedJobId={selectedJobId} setSelectedJobId={setSelectedJobId} />
     </div>
   );
 }

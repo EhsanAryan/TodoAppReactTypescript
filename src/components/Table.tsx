@@ -3,16 +3,25 @@ import "./Table.css"
 import { JobType } from "../Types/JobType";
 import swal from "sweetalert";
 
-type SetAllJobsParameter = (prevState: JobType[]) => JobType[]
+
+type SetAllJobsParameterType = (prevState: JobType[]) => JobType[]
+
+type SetJobParameterType = (prevJob: string) => string;
+
+type SetSelectedJobIdParameterType = (prevJobId: string) => string;
 
 type TableProps = {
     allJobs : JobType[] ,
-    setAllJobs : (newAllJobs: JobType[] | SetAllJobsParameter) => void
+    setAllJobs : (newAllJobs: JobType[] | SetAllJobsParameterType) => void ,
+    job : string ,
+    setJob : (newJob: string | SetJobParameterType) => void  ,
+    selectedJobId : string ,
+    setSelectedJobId : (newSelectedJobId: string | SetSelectedJobIdParameterType) => void
 }
 
 
 const Table: React.FC<TableProps> = (props) => {
-    const {allJobs , setAllJobs} = props;
+    const {allJobs , setAllJobs , setJob , selectedJobId , setSelectedJobId} = props;
 
     const tableBodyRef = useRef<HTMLTableSectionElement>(null)
 
@@ -38,6 +47,13 @@ const Table: React.FC<TableProps> = (props) => {
                 localStorage.setItem("jobs" , JSON.stringify(jobs));
             }
         });
+    }
+
+    const selectJob = (jobId : string , event: React.MouseEvent) => {
+        const currentJob: JobType = allJobs.filter(job => job.id === jobId)[0];
+
+        setJob(currentJob.text);
+        setSelectedJobId(jobId);
     }
 
     const handleCompleteness = (jobId : string): void => {
@@ -138,7 +154,8 @@ const Table: React.FC<TableProps> = (props) => {
                     <tbody ref={tableBodyRef}>
                         {allJobs.map((job , jobIndex) => {
                             return (
-                                <tr key={job.id} className={`${job.isCompleted ? "table-active" : ""}`}
+                                <tr key={job.id} className={`${job.isCompleted ? "table-active" : ""}
+                                ${selectedJobId.length !== 0 ? "none-pointer-event" : ""}`}
                                 draggable={true}
                                 onDragStart={handleDragStart} onDragEnd={handleDragEnd}
                                 onDragOver={handleDragOver} onDragLeave={hanldeDragLeave}
@@ -154,9 +171,13 @@ const Table: React.FC<TableProps> = (props) => {
                                         
                                     </td>
                                     <td>
-                                        <button type="button" className="btn btn-outline-light" 
+                                        <button type="button" className="btn mx-1 btn-outline-light" 
                                         onClick={() => deleteJob(job.id)}>
                                             Delete
+                                        </button>
+                                        <button type="button" className="btn mx-1 btn-outline-light" 
+                                        onClick={(event: React.MouseEvent) => selectJob(job.id , event)}>
+                                            Edit
                                         </button>
                                     </td>
                                 </tr>
@@ -165,11 +186,13 @@ const Table: React.FC<TableProps> = (props) => {
                     </tbody>
                 </table>
                 <div className="mt-4 text-center">
-                        <button type="button" className="btn btn-danger btn-lg mx-2 my-1"
+                        <button type="button" className={`btn btn-danger btn-lg mx-2 my-1
+                        ${selectedJobId.length !== 0 ? "none-pointer-event" : ""}`}
                         onClick={deleteAllJobs}>
                             Delete All Jobs
                         </button>
-                        <button type="button" className="btn btn-secondary btn-lg mx-2 my-1"
+                        <button type="button" className={`btn btn-secondary btn-lg mx-2 my-1
+                        ${selectedJobId.length !== 0 ? "none-pointer-event" : ""}`}
                         onClick={deleteCompletedJobs}>
                             Delete Completed Jobs
                         </button>
