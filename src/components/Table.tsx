@@ -1,4 +1,4 @@
-import React from "react";
+import React , { useRef } from "react";
 import "./Table.css"
 import { JobType } from "../Types/JobType";
 import swal from "sweetalert";
@@ -13,6 +13,11 @@ type TableProps = {
 
 const Table: React.FC<TableProps> = (props) => {
     const {allJobs , setAllJobs} = props;
+
+    const tableBodyRef = useRef<HTMLTableSectionElement>(null)
+
+    let draggedTagIndex: number | null = null;
+    let dropTargetIndex: number | null = null;
 
     const deleteJob = (jobId: string): void => {
         swal({
@@ -82,6 +87,37 @@ const Table: React.FC<TableProps> = (props) => {
         });
     }
 
+    const handleDragStart = (event: React.DragEvent<HTMLTableRowElement>) => {
+        event.currentTarget.classList.add("dragged");
+        draggedTagIndex = Number(event.currentTarget.querySelector("td:first-child")!.innerHTML) - 1;
+    }
+
+    const handleDragEnd = (event: React.DragEvent<HTMLTableRowElement>) => {
+        event.currentTarget.classList.remove("dragged");
+        draggedTagIndex = null;
+    }
+
+    const handleDragOver = (event: React.DragEvent<HTMLTableRowElement>) => {
+        event.preventDefault();
+        dropTargetIndex = Number(event.currentTarget.querySelector("td:first-child")!.innerHTML) - 1;
+    }
+
+    const hanldeDragLeave = () => {
+        dropTargetIndex = null;
+    }
+
+    const handleDrop = (event: React.DragEvent<HTMLTableRowElement>) => {
+        event.preventDefault();
+        const jobs = JSON.parse(localStorage.getItem("jobs")!);
+        const draggedJob: JobType = jobs.splice(draggedTagIndex , 1)[0];
+        jobs.splice(dropTargetIndex , 0 , draggedJob);
+
+        setAllJobs(jobs);
+        localStorage.setItem("jobs" , JSON.stringify(jobs));
+        
+        draggedTagIndex = null;
+        dropTargetIndex = null;
+    }
 
     return (
         <div className={`table-container mx-auto rounded-4 my-5 px-3 py-4 
@@ -99,11 +135,15 @@ const Table: React.FC<TableProps> = (props) => {
                             <th>Operations</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody ref={tableBodyRef}>
                         {allJobs.map((job , jobIndex) => {
                             return (
-                                <tr key={job.id} className={`${job.isCompleted ? "table-active" : ""}`}>
-                                    <td>{jobIndex}</td>
+                                <tr key={job.id} className={`${job.isCompleted ? "table-active" : ""}`}
+                                draggable={true}
+                                onDragStart={handleDragStart} onDragEnd={handleDragEnd}
+                                onDragOver={handleDragOver} onDragLeave={hanldeDragLeave}
+                                onDrop={handleDrop}>
+                                    <td>{jobIndex+1}</td>
                                     <td>{job.text}</td>
                                     <td>
                                         <button type="button" className={`btn 

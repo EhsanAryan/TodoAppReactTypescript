@@ -73,7 +73,7 @@ const Input: React.FC<InputProps> = (props) => {
 
 
     return (
-        <div className="input-section mx-auto mt-5 rounded-4 
+        <div className="input-section mx-auto mt-4 rounded-4 
         d-flex flex-column justify-content-center align-items-center">
             <input type="text" className="form-control w-75 mx-auto my-2" placeholder="Enter new job..."
             value={job} onChange={(event: React.ChangeEvent<HTMLInputElement>) => setJob(event.target.value)}
