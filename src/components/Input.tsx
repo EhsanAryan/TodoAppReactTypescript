@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import "./Input.css";
 import { JobType } from "../types/JobType";
 import { jobValidation } from '../utils/jobValidation';
@@ -12,6 +12,8 @@ const Input: React.FC<InputPropsType> = ({
     selectedJobId,
     setSelectedJobId
 }) => {
+
+    const inputRef = useRef<HTMLInputElement>(null);
 
     const handleAddNewJob = () => {
         if (selectedJobId.length === 0) {
@@ -51,6 +53,7 @@ const Input: React.FC<InputPropsType> = ({
             setSelectedJobId("");
             setJob("");
         }
+        inputRef.current?.focus();
     }
 
     const handleAddNewJobWithKeyboard = (event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -69,7 +72,7 @@ const Input: React.FC<InputPropsType> = ({
         <div className="input-section mx-auto mt-4 rounded-4 
         d-flex flex-column justify-content-center align-items-center">
             <input type="text" className="form-control w-75 mx-auto my-2" placeholder="Enter new job..."
-                value={job}
+                ref={inputRef} value={job}
                 onChange={(event: React.ChangeEvent<HTMLInputElement>) => setJob(event.target.value)}
                 onKeyDown={handleAddNewJobWithKeyboard} />
             <div className="my-2">
