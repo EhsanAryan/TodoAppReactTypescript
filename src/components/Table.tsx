@@ -1,106 +1,88 @@
-import React , { useRef } from "react";
+import React from "react";
 import "./Table.css"
-import { JobType } from "../Types/JobType";
+import { JobType } from "../types/JobType";
 import swal from "sweetalert";
+import { TablePropsType } from "../types/TablePropsType";
 
 
-type SetAllJobsParameterType = (prevState: JobType[]) => JobType[]
-
-type SetJobParameterType = (prevJob: string) => string;
-
-type SetSelectedJobIdParameterType = (prevJobId: string) => string;
-
-type TableProps = {
-    allJobs : JobType[] ,
-    setAllJobs : (newAllJobs: JobType[] | SetAllJobsParameterType) => void ,
-    job : string ,
-    setJob : (newJob: string | SetJobParameterType) => void  ,
-    selectedJobId : string ,
-    setSelectedJobId : (newSelectedJobId: string | SetSelectedJobIdParameterType) => void
-}
-
-
-const Table: React.FC<TableProps> = (props) => {
-    const {allJobs , setAllJobs , setJob , selectedJobId , setSelectedJobId} = props;
-
-    const tableBodyRef = useRef<HTMLTableSectionElement>(null)
+const Table: React.FC<TablePropsType> = ({
+    allJobs,
+    setAllJobs,
+    setJob,
+    selectedJobId,
+    setSelectedJobId
+}) => {
 
     let draggedTagIndex: number | null = null;
     let dropTargetIndex: number | null = null;
 
-    const deleteJob = (jobId: string): void => {
-        swal({
-            title: "Confirmation" ,
-            icon : "warning" ,
-            text : "Are you sure?" ,
-            buttons : ["No" , "Yes"] ,
-            dangerMode : true
-        })
-        .then(value => {
-            if(value) {
-                setAllJobs(prevState => {
-                    return prevState.filter(job => job.id !== jobId)
-                });
-        
-                let jobs: JobType[] = JSON.parse(localStorage.getItem("jobs")!);
-                jobs = jobs.filter((job: JobType) => job.id !== jobId);
-                localStorage.setItem("jobs" , JSON.stringify(jobs));
-            }
+    const handleDeleteJob = async (jobId: string) => {
+        const response = await swal({
+            title: "Removing the job",
+            icon: "warning",
+            text: "Are you sure?",
+            buttons: ["No", "Yes"],
+            dangerMode: true
         });
+        if (response) {
+            setAllJobs(prevAllJobs => prevAllJobs.filter(job => job.id !== jobId));
+
+            let jobs: JobType[] = JSON.parse(localStorage.getItem("jobs")!);
+            jobs = jobs.filter((job: JobType) => job.id !== jobId);
+            localStorage.setItem("jobs", JSON.stringify(jobs));
+        }
+
     }
 
-    const selectJob = (jobId : string , event: React.MouseEvent) => {
+    const handleSelectJob = (jobId: string) => {
         const currentJob: JobType = allJobs.filter(job => job.id === jobId)[0];
 
         setJob(currentJob.text);
         setSelectedJobId(jobId);
     }
 
-    const handleCompleteness = (jobId : string): void => {
+    const handleSetCompleteness = (jobId: string): void => {
         let jobs: JobType[] = JSON.parse(localStorage.getItem("jobs")!);
-        jobs.forEach(job => {
-            if(job.id === jobId) {
-                job.isCompleted = !job.isCompleted;
+        jobs = jobs.map(job => {
+            if (job.id === jobId) {
+                return { ...job, isCompleted: !job.isCompleted };
             }
+            return job;
         })
 
         setAllJobs(jobs);
 
-        localStorage.setItem("jobs" , JSON.stringify(jobs));
+        localStorage.setItem("jobs", JSON.stringify(jobs));
     }
 
-    const deleteAllJobs = () => {
-        swal({
-            title: "Confirmation" ,
-            icon : "warning" ,
-            text : "Are you sure?" ,
-            buttons : ["No" , "Yes"] ,
-            dangerMode : true
-        })
-        .then(value => {
-            if(value) {
-                setAllJobs([]);
-                localStorage.removeItem("jobs");
-            }
+    const deleteAllJobs = async () => {
+        const respsonse = await swal({
+            title: "Confirmation",
+            icon: "warning",
+            text: "Are you sure?",
+            buttons: ["No", "Yes"],
+            dangerMode: true
         });
+        if (respsonse) {
+            setAllJobs([]);
+            localStorage.removeItem("jobs");
+        }
     }
 
-    const deleteCompletedJobs = () => {
-        swal({
-            title: "Confirmation" ,
-            icon : "warning" ,
-            text : "Are you sure?" ,
-            buttons : ["No" , "Yes"] ,
-            dangerMode : true
-        })
-        .then(value => {
-            if(value) {
-                let jobs: JobType[] = JSON.parse(localStorage.getItem("jobs")!);
-                jobs = jobs.filter(job => job.isCompleted === false);
-                setAllJobs(jobs);
-                localStorage.setItem("jobs" , JSON.stringify(jobs));
-            }
+    const deleteCompletedJobs = async () => {
+        const response = await swal({
+            title: "Confirmation",
+            icon: "warning",
+            text: "Are you sure?",
+            buttons: ["No", "Yes"],
+            dangerMode: true
         });
+        if(response) {
+            let jobs: JobType[] = JSON.parse(localStorage.getItem("jobs")!);
+            jobs = jobs.filter(job => !job.isCompleted);
+            setAllJobs(jobs);
+            localStorage.setItem("jobs", JSON.stringify(jobs));
+        }
     }
 
     const handleDragStart = (event: React.DragEvent<HTMLTableRowElement>) => {
@@ -125,82 +107,81 @@ const Table: React.FC<TableProps> = (props) => {
     const handleDrop = (event: React.DragEvent<HTMLTableRowElement>) => {
         event.preventDefault();
         const jobs = JSON.parse(localStorage.getItem("jobs")!);
-        const draggedJob: JobType = jobs.splice(draggedTagIndex , 1)[0];
-        jobs.splice(dropTargetIndex , 0 , draggedJob);
+        const draggedJob: JobType = jobs.splice(draggedTagIndex, 1)[0];
+        jobs.splice(dropTargetIndex, 0, draggedJob);
 
         setAllJobs(jobs);
-        localStorage.setItem("jobs" , JSON.stringify(jobs));
-        
+        localStorage.setItem("jobs", JSON.stringify(jobs));
+
         draggedTagIndex = null;
         dropTargetIndex = null;
     }
 
+
     return (
         <div className={`table-container container mx-auto rounded-4 my-5 px-3 py-4
         ${allJobs.length === 0 ? "d-flex justify-content-center align-items-center" : "table-responsive"}`}>
-           {allJobs.length > 0 ? (
-             <>
-                <h1 className="text-center mb-4">Jobs Table</h1>
-                <table className="table table-dark table-bordered table-hover
+            {allJobs.length > 0 ? (
+                <>
+                    <h1 className="text-center mb-4">Jobs Table</h1>
+                    <table className="table table-dark table-bordered table-hover
                 w-100 mx-auto text-center align-middle">
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Job</th>
-                            <th>Completeness</th>
-                            <th>Operations</th>
-                        </tr>
-                    </thead>
-                    <tbody ref={tableBodyRef}>
-                        {allJobs.map((job , jobIndex) => {
-                            return (
-                                <tr key={job.id} className={`${job.isCompleted ? "table-active" : ""}
-                                ${selectedJobId.length !== 0 ? "none-pointer-event" : ""}`}
-                                draggable={true}
-                                onDragStart={handleDragStart} onDragEnd={handleDragEnd}
-                                onDragOver={handleDragOver} onDragLeave={hanldeDragLeave}
-                                onDrop={handleDrop}>
-                                    <td>{jobIndex+1}</td>
-                                    <td>{job.text}</td>
-                                    <td>
-                                        <button type="button" className={`btn 
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Job</th>
+                                <th>Completeness</th>
+                                <th>Operations</th>
+                            </tr>
+                        </thead>
+                        <tbody className={`${selectedJobId.length > 0 ? "none-pointer-event" : ""}`}>
+                            {allJobs.map((job, jobIndex) => {
+                                return (
+                                    <tr key={job.id} className={`${job.isCompleted ? "table-active" : ""}`}
+                                        draggable={true}
+                                        onDragStart={handleDragStart} onDragEnd={handleDragEnd}
+                                        onDragOver={handleDragOver} onDragLeave={hanldeDragLeave}
+                                        onDrop={handleDrop}>
+                                        <td>{jobIndex + 1}</td>
+                                        <td>{job.text}</td>
+                                        <td>
+                                            <button type="button" className={`btn 
                                         ${job.isCompleted ? "btn-success" : "btn-danger"}`}
-                                        onClick={() => handleCompleteness(job.id)}>
-                                            {job.isCompleted ? "Completed" : "Incomplete"}
-                                        </button>
-                                        
-                                    </td>
-                                    <td>
-                                        <button type="button" className="btn mx-1 my-1 btn-outline-light" 
-                                        onClick={() => deleteJob(job.id)}>
-                                            Delete
-                                        </button>
-                                        <button type="button" className="btn mx-1 my-1 btn-outline-light" 
-                                        onClick={(event: React.MouseEvent) => selectJob(job.id , event)}>
-                                            Edit
-                                        </button>
-                                    </td>
-                                </tr>
-                            );
-                        })}
-                    </tbody>
-                </table>
-                <div className="mt-4 text-center">
-                        <button type="button" className={`btn btn-danger btn-lg mx-2 my-1
-                        ${selectedJobId.length !== 0 ? "none-pointer-event" : ""}`}
-                        onClick={deleteAllJobs}>
+                                                onClick={() => handleSetCompleteness(job.id)}>
+                                                {job.isCompleted ? "Completed" : "Incomplete"}
+                                            </button>
+
+                                        </td>
+                                        <td>
+                                            <button type="button" className="btn mx-1 my-1 btn-outline-light"
+                                                onClick={() => handleDeleteJob(job.id)}>
+                                                Delete
+                                            </button>
+                                            <button type="button" className="btn mx-1 my-1 btn-outline-light"
+                                                onClick={(event: React.MouseEvent) => handleSelectJob(job.id)}>
+                                                Edit
+                                            </button>
+                                        </td>
+                                    </tr>
+                                );
+                            })}
+                        </tbody>
+                    </table>
+                    <div className={`mt-4 text-center 
+                    ${selectedJobId.length > 0 ? "none-pointer-event" : ""}`}>
+                        <button type="button" className="btn btn-danger btn-lg mx-2 my-1"
+                            onClick={deleteAllJobs}>
                             Delete All Jobs
                         </button>
-                        <button type="button" className={`btn btn-secondary btn-lg mx-2 my-1
-                        ${selectedJobId.length !== 0 ? "none-pointer-event" : ""}`}
-                        onClick={deleteCompletedJobs}>
+                        <button type="button" className="btn btn-secondary btn-lg mx-2 my-1"
+                            onClick={deleteCompletedJobs}>
                             Delete Completed Jobs
                         </button>
-                </div>
-             </>
-           ) : (
-            <h1>No jobs to show!</h1>
-           )}
+                    </div>
+                </>
+            ) : (
+                <h1>No jobs to show!</h1>
+            )}
         </div>
     )
 }
