@@ -27,10 +27,9 @@ const Input: React.FC<InputPropsType> = ({
                 isCompleted: false
             }
 
-            setAllJobs(prevState => [...prevState, newJob]);
-
             let jobs: JobType[] = localStorage.getItem("jobs") ? JSON.parse(localStorage.getItem("jobs")!) : [];
             jobs = [...jobs, newJob];
+            setAllJobs(jobs);
             localStorage.setItem("jobs", JSON.stringify(jobs));
 
             setJob("");

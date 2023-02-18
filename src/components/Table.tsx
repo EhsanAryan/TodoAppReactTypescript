@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import "./Table.css"
 import { JobType } from "../types/JobType";
 import swal from "sweetalert";
@@ -13,6 +13,8 @@ const Table: React.FC<TablePropsType> = ({
     setSelectedJobId
 }) => {
 
+    const [searchChars, setSearchChars] = useState<string>("");
+
     let draggedTagIndex: number | null = null;
     let dropTargetIndex: number | null = null;
 
@@ -25,9 +27,8 @@ const Table: React.FC<TablePropsType> = ({
             dangerMode: true
         });
         if (response) {
-            setAllJobs(prevAllJobs => prevAllJobs.filter(job => job.id !== jobId));
-
             let jobs: JobType[] = JSON.parse(localStorage.getItem("jobs")!);
+            setAllJobs(jobs.filter(job => job.id !== jobId));
             jobs = jobs.filter((job: JobType) => job.id !== jobId);
             localStorage.setItem("jobs", JSON.stringify(jobs));
         }
@@ -77,7 +78,7 @@ const Table: React.FC<TablePropsType> = ({
             buttons: ["No", "Yes"],
             dangerMode: true
         });
-        if(response) {
+        if (response) {
             let jobs: JobType[] = JSON.parse(localStorage.getItem("jobs")!);
             jobs = jobs.filter(job => !job.isCompleted);
             setAllJobs(jobs);
@@ -106,7 +107,7 @@ const Table: React.FC<TablePropsType> = ({
 
     const handleDrop = (event: React.DragEvent<HTMLTableRowElement>) => {
         event.preventDefault();
-        const jobs = JSON.parse(localStorage.getItem("jobs")!);
+        let jobs = JSON.parse(localStorage.getItem("jobs")!);
         const draggedJob: JobType = jobs.splice(draggedTagIndex, 1)[0];
         jobs.splice(dropTargetIndex, 0, draggedJob);
 
@@ -117,13 +118,29 @@ const Table: React.FC<TablePropsType> = ({
         dropTargetIndex = null;
     }
 
+    useEffect(() => {
+        const jobs: JobType[] = localStorage.getItem("jobs") ? JSON.parse(localStorage.getItem("jobs")!) : [];
+        const newJobs = jobs.filter((j: JobType) => {
+            return j.text.toLowerCase().includes(searchChars.trim().toLowerCase())
+        });
+        setAllJobs(newJobs);
+    }, [searchChars])
+
 
     return (
-        <div className={`table-container container mx-auto rounded-4 my-5 px-3 py-4
-        ${allJobs.length === 0 ? "d-flex justify-content-center align-items-center" : "table-responsive"}`}>
+        <div className="table-container container mx-auto rounded-4 my-5 px-3 py-4 table-responsive">
+            <div className="row mb-4">
+                <h1 className="col-12 col-md-6 col-lg-4 m-0 text-center text-md-start">
+                    Jobs Table
+                </h1>
+                <div className="col-12 col-md-6 col-lg-4 ms-auto mt-3 mt-md-0">
+                    <input type="text" className="form-control" placeholder="Enter job title..."
+                        value={searchChars}
+                        onChange={(ev: React.ChangeEvent<HTMLInputElement>) => setSearchChars(ev.target.value)} />
+                </div>
+            </div>
             {allJobs.length > 0 ? (
                 <>
-                    <h1 className="text-center mb-4">Jobs Table</h1>
                     <table className="table table-dark table-bordered table-hover
                 w-100 mx-auto text-center align-middle">
                         <thead>
@@ -158,7 +175,7 @@ const Table: React.FC<TablePropsType> = ({
                                                 Delete
                                             </button>
                                             <button type="button" className="btn mx-1 my-1 btn-outline-light"
-                                                onClick={(event: React.MouseEvent) => handleSelectJob(job.id)}>
+                                                onClick={() => handleSelectJob(job.id)}>
                                                 Edit
                                             </button>
                                         </td>
@@ -167,6 +184,7 @@ const Table: React.FC<TablePropsType> = ({
                             })}
                         </tbody>
                     </table>
+                    
                     <div className={`mt-4 text-center 
                     ${selectedJobId.length > 0 ? "none-pointer-event" : ""}`}>
                         <button type="button" className="btn btn-danger btn-lg mx-2 my-1"
@@ -180,7 +198,7 @@ const Table: React.FC<TablePropsType> = ({
                     </div>
                 </>
             ) : (
-                <h1>No jobs to show!</h1>
+                <div className="h1 text-center my-5">No jobs to show!</div>
             )}
         </div>
     )
