@@ -88,7 +88,7 @@ const Table: React.FC<TablePropsType> = ({
 
     const handleDragStart = (event: React.DragEvent<HTMLTableRowElement>) => {
         event.currentTarget.classList.add("dragged");
-        draggedTagIndex = Number(event.currentTarget.querySelector("td:first-child")!.innerHTML) - 1;
+        draggedTagIndex = Number(event.currentTarget.querySelector("td:first-of-type")!.innerHTML) - 1;
     }
 
     const handleDragEnd = (event: React.DragEvent<HTMLTableRowElement>) => {
@@ -98,7 +98,7 @@ const Table: React.FC<TablePropsType> = ({
 
     const handleDragOver = (event: React.DragEvent<HTMLTableRowElement>) => {
         event.preventDefault();
-        dropTargetIndex = Number(event.currentTarget.querySelector("td:first-child")!.innerHTML) - 1;
+        dropTargetIndex = Number(event.currentTarget.querySelector("td:first-of-type")!.innerHTML) - 1;
     }
 
     const hanldeDragLeave = () => {
